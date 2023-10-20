@@ -8,12 +8,27 @@
     <style>
       #app {
         text-align: center;
-        font-family: sans-serif;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: xx-large;
+      }
+
+      .heading {
+        font-family: 'Courier New', Courier, monospace;
+      }
+
+      h2 {
+        font-size: 5rem;
+        margin-bottom: 20px;
+      }
+
+      #instruction {
+        font-size: 36px;
+        margin: 0px 10px;
       }
 
       #problem {
         font-size: 144px;
-        margin-top: 20%;
+        margin: 8% 0%;
       }
 
       .incorrect {
@@ -21,9 +36,10 @@
       }
 
       input {
-        font-size: 72px;
-        padding:2%;
         width: 300px;
+        padding:2%;
+        font-size: 72px;
+        text-align: center;
         border-radius: 5%;
         outline-color: gray;
         outline-style: solid;
@@ -32,6 +48,7 @@
 
       #score {
         font-size: 72px;
+        margin-top: 5%;
       }
 
       #winner {
@@ -107,6 +124,17 @@
           score_down: 0
         });
 
+        function reset(event) {
+          setState({
+            num1: 1,
+            num2: 1,
+            response: "",
+            score: 0,
+            incorrect: false,
+            score_down: 0
+          });
+        }
+
         function updateResponse(event) {
           setState({
             ...state,
@@ -143,25 +171,30 @@
 
         if (state.score === 10) {
           return (
-            <div id="winner">You won!</div>
+            <div id="winner" onClick={reset}>You won!</div>
           );
         }
 
         if (state.score < 0) {
           return (
-            <div id="loser">You lose!</div>
+            <div id="loser" onClick={reset}>You lose!</div>
           );
         }
 
         return (
           <div>
+            <div class="heading">
+              <h2>Addition</h2>
+              <p id="instruction">Score 10 to win.</p>
+              <p id="instruction">Lose if score below 0.</p>
+            </div>
             <div 
               id="problem"
               className={state.incorrect ? "incorrect" : ""}>
               {state.num1} + {state.num2}
             </div>
             
-            <input autoFocus onKeyPress={inputKeyPress} onChange={updateResponse} value={state.response} />
+            <input autoFocus onKeyPress={inputKeyPress} onChange={updateResponse} value={state.response} type={Number}/>
             
             <div 
               id="score" 
