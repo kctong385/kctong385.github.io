@@ -21,7 +21,7 @@
         margin-bottom: 20px;
       }
 
-      #instruction {
+      .instruction {
         font-size: 36px;
         margin: 0px 10px;
       }
@@ -171,13 +171,19 @@
 
         if (state.score === 10) {
           return (
-            <div id="winner" onClick={reset}>You won!</div>
+            <div onClick={reset}>
+              <p id="winner">You won!</p>
+              <p class="instruction">Click to Restart</p>
+            </div>
           );
         }
 
         if (state.score < 0) {
           return (
-            <div id="loser" onClick={reset}>You lose!</div>
+            <div onClick={reset}>
+              <p id="loser">You lose!</p>
+              <p class="instruction">Click to Restart</p>
+            </div>
           );
         }
 
@@ -185,8 +191,8 @@
           <div>
             <div class="heading">
               <h2>Addition</h2>
-              <p id="instruction">Score 10 to win.</p>
-              <p id="instruction">Lose if score below 0.</p>
+              <p class="instruction">Score 10 to win.</p>
+              <p class="instruction">Lose if score below 0.</p>
             </div>
             <div 
               id="problem"
