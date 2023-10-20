@@ -61,11 +61,10 @@
       }
 
       #loser {
-        position: relative;
         margin-top: 20%;
         color: purple;
         font-size: 144px;
-        animation-name: wave;
+        animation-name: wiggle;
         animation-duration: 5s;
         animation-fill-mode: forwards;
         animation-iteration-count: 10;
@@ -86,15 +85,18 @@
         }
       }
 
-      @keyframes wave {
+      @keyframes wiggle {
         0% {
-          left: -10%;
+          transform: rotate(0deg);
         }
-        50% {
-          left: 10%;
+        25% {
+          transform: rotate(-15deg);
+        }
+        75% {
+          transform: rotate(15deg);
         }
         100% {
-          left: -10%;
+          transform: rotate(0deg);
         }
       }
 
