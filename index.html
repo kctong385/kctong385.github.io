@@ -12,12 +12,81 @@
       }
 
       #problem {
+        font-size: 144px;
+        margin-top: 10%;
+      }
+
+      .incorrect {
+        color: red;
+      }
+
+      input {
+        font-size: 72px;
+        padding:2%;
+        width: 300px;
+        border-radius: 5%;
+        outline-color: gray;
+        outline-style: solid;
+        outline-width: 3px;
+      }
+
+      #score {
         font-size: 72px;
       }
 
       #winner {
-        font-size: 72px;
+        margin-top: 10%;
         color: green;
+        animation-name: grow;
+        animation-duration: 5s;
+        animation-fill-mode: forwards;
+      }
+
+      #loser {
+        position: relative;
+        margin-top: 10%;
+        color: purple;
+        font-size: 144px;
+        animation-name: wave;
+        animation-duration: 5s;
+        animation-fill-mode: forwards;
+        animation-iteration-count: 10;
+      }
+
+      .score_down[inc='1'] {
+        animation-name: flashRed;
+        animation-duration: 2s;
+        animation-fill-mode: forwards;
+      }
+
+      @keyframes grow {
+        from {
+          font-size: 0px;
+        }
+        to {
+          font-size: 144px;
+        }
+      }
+
+      @keyframes wave {
+        0% {
+          left: -10%;
+        }
+        50% {
+          left: 10%;
+        }
+        100% {
+          left: -10%;
+        }
+      }
+
+      @keyframes flashRed {
+        0% {
+          color: red;
+        }
+        100% {
+          color: black;
+        }
       }
     </style>
 
@@ -32,7 +101,9 @@
           num1: 1,
           num2: 1,
           response: "",
-          score: 0
+          score: 0,
+          incorrect: false,
+          score_down: 0
         });
 
         function updateResponse(event) {
@@ -52,14 +123,18 @@
                 score: state.score + 1,
                 response: "",
                 num1: Math.ceil(Math.random() * 10),
-                num2: Math.ceil(Math.random() * 10)
+                num2: Math.ceil(Math.random() * 10),
+                incorrect: false,
+                score_down: 0
               });
             } else {
               // User got question wrong
               setState({
                 ...state,
                 score: state.score - 1,
-                response: ""
+                response: "",
+                incorrect: true,
+                score_down: 1
               });
             }
           }
@@ -69,15 +144,36 @@
           return (
             <div id="winner">You won!</div>
           );
-        } else {
+        }
+
+        if (state.score < 0) {
           return (
-            <div>
-              <div id="problem">{state.num1} + {state.num2}</div>
-              <input onKeyPress={inputKeyPress} onChange={updateResponse} value={state.response} />
-              <div>Score: {state.score}</div>
-            </div>
+            <div id="loser">You lose!</div>
           );
         }
+
+        return (
+          <div>
+            <div 
+              id="problem"
+              className={state.incorrect ? "incorrect" : ""}>
+              {state.num1} + {state.num2}
+            </div>
+            
+            <input autoFocus onKeyPress={inputKeyPress} onChange={updateResponse} value={state.response} />
+            
+            <div 
+              id="score" 
+              inc={state.score_down} 
+              className="score_down"
+              onAnimationEnd={() => setState({
+                ...state,
+                score_down: 0
+              })}>
+              Score: {state.score}
+            </div>
+          </div>
+        );
       }
       ReactDOM.render(<App />, document.querySelector("#app"));
     </script>
