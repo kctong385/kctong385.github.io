@@ -31,6 +31,18 @@
         margin: 8% 0%;
       }
 
+      .transitionIn {
+        animation-name: fadeIn;
+        animation-duration: 2s;
+        animation-fill-mode: forwards;
+      }
+
+      .transitionOut {
+        animation-name: fadeOut;
+        animation-duration: 2s;
+        animation-fill-mode: forwards;
+      }
+
       .incorrect {
         color: red;
       }
@@ -46,9 +58,30 @@
         outline-width: 3px;
       }
 
+      .game_info {
+        font-size: 72px;
+        margin-top: 5%;
+      }
+
       #score {
         font-size: 72px;
         margin-top: 5%;
+      }
+
+      #score[inc='1'] {
+        animation-name: flashRed;
+        animation-duration: 2s;
+        animation-fill-mode: forwards;
+      }
+
+      #levelup {
+        margin-top: 20%;
+        color: green;
+        font-size: 108px;
+        text-shadow: 3px 3px gray;
+        animation-name: fadeIn;
+        animation-duration: 3s;
+        animation-fill-mode: forwards;
       }
 
       #winner {
@@ -70,10 +103,23 @@
         animation-iteration-count: 10;
       }
 
-      .score_down[inc='1'] {
-        animation-name: flashRed;
-        animation-duration: 2s;
-        animation-fill-mode: forwards;
+
+      @keyframes fadeOut {
+        from {
+          opacity: 100%;
+        }
+        to {
+          opacity: 0%;
+        }
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0%;
+        }
+        100% {
+          opacity: 100%;
+        }
       }
 
       @keyframes grow {
@@ -118,30 +164,72 @@
     <script type="text/babel">
       function App() {
         const [state, setState] = React.useState({
+          level: 1,
           num1: 1,
           num2: 1,
           response: "",
           score: 0,
           incorrect: false,
-          score_down: 0
+          score_down: 0,
         });
 
-        function reset(event) {
+        // To reset after game is over
+        function reset() {
           setState({
+            level: 1,
             num1: 1,
             num2: 1,
             response: "",
             score: 0,
             incorrect: false,
-            score_down: 0
+            score_down: 0,
           });
         }
 
+        // To levelup
+        function nextLevel() {
+          setState({
+            ...state,
+            num1: generateProblem(1)[0],
+            num2: generateProblem(1)[1],
+            response: "",
+            score: 0,
+            incorrect: false,
+            score_down: 0,
+            level: state.level + 1,
+          });
+        }
+
+        // Update for user input
         function updateResponse(event) {
           setState({
             ...state,
             response: event.target.value
           });
+        }
+
+        function getRandomArbitrary(min, max) {
+          return Math.ceil(Math.random() * (max - min) + min);
+        }
+
+        // Reset num1 and num2 according to level
+        function generateProblem(levelOffset) {
+          let num1, num2;
+          if (state.level + levelOffset === 1) {
+              num1 = getRandomArbitrary(1, 5),
+              num2 = getRandomArbitrary(1, 5)
+          }
+
+          if (state.level + levelOffset === 2) {
+            num1 = getRandomArbitrary(6, 10),
+            num2 = getRandomArbitrary(1, 5)
+          }
+
+          if (state.level + levelOffset === 3) {
+            num1 = getRandomArbitrary(6, 10),
+            num2 = getRandomArbitrary(6, 10)
+          }
+          return [num1, num2]
         }
 
         function inputKeyPress(event) {
@@ -151,13 +239,14 @@
               // User got question right
               setState({
                 ...state,
+                num1: generateProblem(0)[0],
+                num2: generateProblem(0)[1],
                 score: state.score + 1,
                 response: "",
-                num1: Math.ceil(Math.random() * 10),
-                num2: Math.ceil(Math.random() * 10),
                 incorrect: false,
-                score_down: 0
+                score_down: 0,
               });
+              
             } else {
               // User got question wrong
               setState({
@@ -171,15 +260,28 @@
           }
         }
 
+        // Winning scene
         if (state.score === 10) {
-          return (
-            <div onClick={reset}>
-              <p id="winner">You won!</p>
-              <p class="instruction">Click to Restart</p>
-            </div>
-          );
+          if (state.level < 3) {
+            return (
+              <div onClick={nextLevel}>
+                <p id="levelup">You level up!</p>
+                <p class="instruction">Click to Continue</p>
+              </div>
+            );
+          }
+
+          if (state.level === 3) {
+            return (
+              <div onClick={reset}>
+                <p id="winner">You won!</p>
+                <p class="instruction">Click to Restart</p>
+              </div>
+            );
+          }
         }
 
+        // Losing scene
         if (state.score < 0) {
           return (
             <div onClick={reset}>
@@ -189,13 +291,15 @@
           );
         }
 
+        // Next problem
         return (
           <div>
             <div class="heading">
               <h2>Addition</h2>
-              <p class="instruction">Score 10 to win.</p>
+              <p class="instruction">Score 10 to {state.level < 3 ? 'level up' : 'win'}.</p>
               <p class="instruction">Lose if score below 0.</p>
             </div>
+            <div className="game_info">Level: {state.level}</div>
             <div 
               id="problem"
               className={state.incorrect ? "incorrect" : ""}>
@@ -207,7 +311,7 @@
             <div 
               id="score" 
               inc={state.score_down} 
-              className="score_down"
+              className="game_info"
               onAnimationEnd={() => setState({
                 ...state,
                 score_down: 0
@@ -217,6 +321,7 @@
           </div>
         );
       }
+
       ReactDOM.render(<App />, document.querySelector("#app"));
     </script>
   </body>
